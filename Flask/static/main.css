@@ -1,0 +1,57 @@
+.header{
+
+	color:#fff;
+	padding: 2%;
+	text-align: center;
+}
+
+.content{
+}
+
+header{
+	font-size: -webkit-xxx-large;
+}
+
+footer{
+	background-color: #333;
+	height: 10vh;
+	color:#fff;
+	padding: 0;
+	text-align: center;
+	position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 60px;
+    line-height: 60px;
+}
+
+
+body {
+  padding-top: 100px;
+}
+
+.wide {
+  width:100%;
+  height:200px;
+  background-image:url('/static/079887835_prevstill.jpeg');
+  background-size:cover;
+}
+
+.wide img {
+  width:100%;
+}
+
+.logo {
+  color:#fff;
+  font-weight:800;
+  font-size:14pt;
+  padding:25px;
+  text-align:center;
+}
+
+.line {
+  overflow:hidden;
+  text-align:center;
+}
+  padding-top:20px;
+  white-space:no-wrap;

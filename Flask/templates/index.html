@@ -1,0 +1,42 @@
+{% extends "layout.html" %}
+{% block login_logout %}
+<a href="/">
+    <button class="btn btn-secondary my-2 my-sm-0" type="button">Logout</button>
+</a>
+{% endblock %}
+{% block PageName %}
+<div class="content row">
+    <div class="panel panel-info">
+        <div class="panel-body">
+
+            Welcome to Car Plate Recognition System
+
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block content %}
+<div class="panel panel-info">
+    <div class="panel-body">
+        <form method="post" action="">
+            <div id="div_id_operation" class="form-group required">
+                <label for="id_operation" class="control-label col-md-4  requiredField"><a class="text-light"> Image </a><span class="asteriskField">:</span> </label>
+                <div class="controls col-md-8 ">
+                    <select id="id_operation" class="form-control" name="operation_choice" style="margin-bottom: 10px">
+                        {% for oper in operation %}
+                        <option value="{{oper}}">{{oper}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="aab controls col-md-4 "></div>
+                <div class="controls col-md-8 ">
+                    <input type="submit" name="shoot" value="Select" class="btn btn-primary btn btn-info" id="submit-id-signup"/>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+</div>
+{% endblock content %}

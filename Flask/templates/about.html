@@ -1,0 +1,38 @@
+{% extends "layout.html" %}
+{% block login_logout %}
+<a href="/"><button class="btn btn-secondary my-2 my-sm-0" type="button">Logout</button></a>
+{% endblock %}
+{% block PageName %}
+<div class="content row">
+    <div class="panel panel-info">
+        <div class="panel-body" >
+
+            About
+
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block content %}
+<div class="panel panel-info">
+    <div class="panel-body" >
+        <div>
+            Today, there are many students who travel to foreign countries to pursue higher education.
+            The application is intended to help students evaluate their chances of acceptance for graduate study in Computer Science at various American universities.
+            Due to the increased number of applicants, universities manually check the applicants who should get an admit into their university.
+            Taking these issues into consideration, our goal is to build an efficient machine learning algorithms to assist students and university.
+        </div>
+        <div>
+            Assisting student Model:
+            It is a classification model, that will allow students on 2 fronts:
+            - Student can get a prediction on how likely the university will provide them with admit or reject based on his or her application file
+            - Students can also get the TOP 5 university in which he should apply to based on the best-suited university
+        </div>
+        <div>
+            Assisting University Model:
+- This could be used by the university to analyze the profile of the student and make decision-based on the classification if the student would get the admission or rejection
+        </div>
+</div>
+</div>
+
+{% endblock %}

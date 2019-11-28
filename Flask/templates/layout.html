@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+    <script src="https://netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+    <title>Graduate Admission Portal</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='main.css')}}">
+    <!-- meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+</head>
+
+
+<body background="{{ url_for('static', filename='hello.jpeg') }}">
+<!-- header -->
+<div class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/"><span class="glyphicon glyphicon-home"></span> Home</a>
+        </div>
+        <div class="collapse navbar-collapse">
+            <ul class="nav navbar-nav">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Predictions</a>
+                    <div class="dropdown-menu">
+                        <a class="dropdown-item" role="menuitem" href="#">Get Recommendation</a>
+                        <a class="dropdown-item" role="menuitem" href="#">Get Admit Prediction</a>
+                    </div>
+                </li>
+
+            </ul>
+
+        </div><!--/.nav-collapse -->
+
+    </div>
+
+
+</div>
+
+<div class="modal" id="loginModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Graph</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form method="post" action="">
+                    <div id="div_id_year" class="form-group required">
+                        <label for="id_year" class="control-label col-md-4  requiredField"><a class="text-light"> Years </a><span class="asteriskField">:</span> </label>
+                        <div class="controls col-md-8 ">
+                            <select id="id_year" class="form-control" name="year" style="margin-bottom: 10px">
+                                <option selected value="None">Choose Year</option>
+                                <option value="10_years">10 years</option>
+                                <option value="5_years">5 years</option>
+                            </select>
+                        </div>
+                    </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end login modal-->
+
+<div class="container">
+    <div class="text-center">
+        <h1 style="color : black;"> {% block PageName %}{% endblock %}</h1>
+    </div>
+
+    <!-- content -->
+
+    <div class="container">
+        <div class="content row">
+
+            <div class="col-md-10">{% block content %}{% endblock %}</div>
+
+        </div>
+    </div>
+</div>
+</body>
+</html>
