@@ -1,32 +1,14 @@
 <!doctype html>
 <body background="{{ url_for('static', filename='hello.jpeg') }}">
 
-<title>Python Flask File Upload Example</title>
-<h2>Select a file to upload</h2>
-<p>
-    {% with messages = get_flashed_messages() %}
-    {% if messages %}
-<ul class=flashes>
-    {% for message in messages %}
-    <li>{{ message }}</li>
-    {% endfor %}
-</ul>
-{% endif %}
-{% endwith %}
-</p>
+<center><title>Python Flask File Upload Example</title></center>
+<center><h2 style="color:red;">Select a file to upload</h2></center>
+
+
 <form method="post" action="/upload" enctype="multipart/form-data">
-    <dl>
-        <p>
-            <input type="file" name="file" autocomplete="off" required>
-        </p>
-    </dl>
-
     <div class="form-group">
-        <div class="aab controls col-md-4 "></div>
-        <div class="controls col-md-8 ">
-            <input type="submit" name="shoot" value="Select" class="btn btn-primary btn btn-info" id="submit-id-signup"/>
-
-        </div>
+        <center><label for="exampleFormControlFile1" style="color:white;">Example file input</label></center>
+        <center><input type="file" name="file" autocomplete="off" required class="form-control-file" id="exampleFormControlFile1"></center>
+        <center><input type="submit" name="shoot" value="Select" class="btn btn-primary btn btn-info" id="submit-id-signup"/></center>
     </div>
 </form>
-</body>

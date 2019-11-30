@@ -11,19 +11,6 @@ import os
 from werkzeug.utils import secure_filename
 
 
-def prediction():
-    root = tkinter.Tk()
-    root.withdraw()  # use to hide tkinter window
-
-    currdir = os.getcwd()
-    tempdir = tkFileDialog.askdirectory(parent=root, initialdir=currdir, title='Please select a directory')
-    if len(tempdir) > 0:
-        print("You chose %s" % tempdir)
-        return tempdir
-    else:
-        return None
-
-
 ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
 
 
