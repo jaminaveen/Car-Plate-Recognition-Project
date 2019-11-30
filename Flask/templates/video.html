@@ -1,0 +1,17 @@
+<!doctype html>
+<body background="{{ url_for('static', filename='hello.jpeg') }}">
+
+<center><title>Python Flask File Upload Example</title></center>
+<center><h2 style="color:red;">Click a Snapshot from Video</h2></center>
+
+<center><p style="color:green;">=============================================</p></center>
+<form method="post" action="/video" enctype="multipart/form-data">
+    <div class="form-group">
+        <center><input type="submit" name="shoot" value="CLICK ME" class="btn btn-primary btn btn-info" id="submit-id-signup"/></center>
+    </div>
+</form>
+
+<center><p style="color:green;">=============================================</p></center>
+<center><bold><p style="color:green;">NOTE : </p></bold></center>
+<center><p style="color:green;">1. Check the pop-up for the webcam</p></center>
+<center><p style="color:green;">2. Press 'S' to save the video</p></center>

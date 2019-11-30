@@ -26,7 +26,7 @@ new_file_name = ''
 # @app.route("/index", methods=["GET", "POST"])
 def index():
     if request.method == "GET":
-        user_name = 'Team AMD'
+        user_name = 'Team ML Pipelining'
         operation = ['Local System', 'Click Picture']
         return render_template('index.html', user_name=user_name, operation=operation)
     elif request.method == "POST":
@@ -69,6 +69,16 @@ def output():
         img = mpimg.imread(filename)
         imgplot = plt.imshow(img)
         plt.show()
+        return redirect(url_for('index'))
+
+
+@app.route('/video', methods=["POST"])
+def video():
+    if request.method == "POST":
+        file_name = video_capture(app)
+        global new_file_name
+        new_file_name = file_name
+        print(new_file_name)
         return redirect(url_for('index'))
 
 
