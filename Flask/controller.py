@@ -11,6 +11,8 @@ import os
 from werkzeug.utils import secure_filename
 import cv2
 import random, string
+from boto3.s3.transfer import S3Transfer
+import boto3
 
 ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
 
@@ -22,7 +24,7 @@ def allowed_file(filename):
 def video_capture(app):
     unique_identify_user = ''.join(random.choices(string.ascii_letters + string.digits, k=20))
     key = cv2.waitKey(1)
-    webcam = cv2.VideoCapture(0)
+    webcam = cv2.VideoCapture(0 + cv2.CAP_DSHOW)
     while True:
         try:
             check, frame = webcam.read()
@@ -50,3 +52,10 @@ def video_capture(app):
             cv2.destroyAllWindows()
             break
     return file_name
+
+
+def upload_aws(SOURCE_FILENAME):
+    aws_id = 'AKIAJ4CSH5Z3BFHREHQQ'
+    aws_secret = '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'
+    S3 = boto3.client('s3', aws_access_key_id=aws_id, aws_secret_access_key=aws_secret)
+    S3.upload_file(SOURCE_FILENAME,'info7374', SOURCE_FILENAME)

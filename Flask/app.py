@@ -23,7 +23,7 @@ new_file_name = ''
 
 
 @app.route('/', methods=["GET", "POST"])
-# @app.route("/index", methods=["GET", "POST"])
+@app.route("/index", methods=["GET", "POST"])
 def index():
     if request.method == "GET":
         user_name = 'Team ML Pipelining'
@@ -41,7 +41,7 @@ def index():
 def upload():
     if request.method == "POST":
         file = request.files['file']
-        print(file)
+
         if file.filename == '':
             flash('No file selected for uploading')
             return redirect(url_for('upload'))
@@ -53,10 +53,25 @@ def upload():
             new_file_name = str(unique_identify_user) + '_' + str(os.path.splitext(filename)[0]) + str(os.path.splitext(filename)[1])
             saved_file = os.path.join(app.config['UPLOAD_FOLDER'], new_file_name)
             file.save(os.path.join(saved_file))
+
+
+            # AWS CONNECT
+            # upload_aws(img_upload)
             return redirect(url_for('index'))
         else:
             flash('Allowed file types are txt, pdf, png, jpg, jpeg, gif')
             return redirect(url_for('upload'))
+
+
+@app.route('/video', methods=["POST"])
+def video():
+    if request.method == "POST":
+        print('INSIDE VIDEO')
+        file_name = video_capture(app)
+        global new_file_name
+        new_file_name = file_name
+        print(new_file_name)
+        return redirect(url_for('index'))
 
 
 @app.route('/output', methods=["POST"])
@@ -69,16 +84,6 @@ def output():
         img = mpimg.imread(filename)
         imgplot = plt.imshow(img)
         plt.show()
-        return redirect(url_for('index'))
-
-
-@app.route('/video', methods=["POST"])
-def video():
-    if request.method == "POST":
-        file_name = video_capture(app)
-        global new_file_name
-        new_file_name = file_name
-        print(new_file_name)
         return redirect(url_for('index'))
 
 
