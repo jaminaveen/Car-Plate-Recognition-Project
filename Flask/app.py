@@ -11,10 +11,14 @@ import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 import os.path
 from os import path
+import matplotlib.pyplot as plt
+import matplotlib.image as mpimg
+import cv2
+import numpy as np
 
 app = Flask(__name__)
 
-UPLOAD_FOLDER = r'C:\Users\91880\Desktop\GOOGLE DRIVE\Flask Car Plate Recognition System\venv\Programs\Images_upload'
+UPLOAD_FOLDER = r'C:\Users\91880\Desktop\GOOGLE_DRIVE\Flask_Car_Plate_Recognition_System\venv\Programs\Images_upload'
 app.secret_key = "secret key"
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
@@ -52,8 +56,8 @@ def upload():
             global new_file_name
             new_file_name = str(unique_identify_user) + '_' + str(os.path.splitext(filename)[0]) + str(os.path.splitext(filename)[1])
             saved_file = os.path.join(app.config['UPLOAD_FOLDER'], new_file_name)
+            print(saved_file)
             file.save(os.path.join(saved_file))
-
 
             # AWS CONNECT
             # upload_aws(img_upload)
@@ -79,11 +83,22 @@ def output():
     if request.method == "POST":
         global new_file_name
         filename = os.path.join(app.config['UPLOAD_FOLDER'], new_file_name)
-        # print(filename)
-        # print(new_file_name)
-        img = mpimg.imread(filename)
-        imgplot = plt.imshow(img)
-        plt.show()
+
+        file_path = yolo_bounding_box(filename)
+        # read the data from the file
+        print(file_path)
+        with open(file_path, 'rb') as infile:
+            buf = infile.read()
+
+        # use numpy to construct an array from the bytes
+        x = np.fromstring(buf, dtype='uint8')
+
+        # decode the array into an image
+        img = cv2.imdecode(x, cv2.IMREAD_UNCHANGED)
+
+        # show it
+        cv2.imshow("Bounding Box for the image", img)
+        cv2.waitKey(0)
         return redirect(url_for('index'))
 
 
