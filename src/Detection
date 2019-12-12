@@ -2,7 +2,6 @@
 import configparser
 import cv2 as cv
 import argparse
-import sys
 import numpy as np
 import os
 import boto3
@@ -196,4 +195,8 @@ if __name__ == "__main__":
     for img_url in img_urls:
         detect_one(img_url)
 
-    
+    files_to_upload = os.listdir('../tmp')
+    for f in files_to_upload:
+        util.upload_file_to_bucket(client,config['buckets']['detected'])
+
+    print("All files in car_pic have been detected.")

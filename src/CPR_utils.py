@@ -27,3 +27,5 @@ def get_objecturls_from_bucket(client, bucket):
             urls.append(url)
         next_token = results.get('NextContinuationToken')
     return urls
+
+
