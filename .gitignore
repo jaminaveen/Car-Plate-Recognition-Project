@@ -114,3 +114,9 @@ tmp/
 
 # dataset
 dataset/
+
+# .vs
+.vs/
+
+# data
+data/
