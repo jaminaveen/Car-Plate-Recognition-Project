@@ -111,3 +111,9 @@ tmp/
 
 # .idea
 .idea/
+
+# .vs
+.vs/
+
+# data
+data/
