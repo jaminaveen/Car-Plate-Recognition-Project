@@ -112,8 +112,5 @@ tmp/
 # .idea
 .idea/
 
-# .vs
-.vs/
-
-# data
-data/
+# dataset
+dataset/
