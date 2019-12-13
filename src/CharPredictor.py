@@ -6,13 +6,16 @@ import boto3
 import numpy as np
 import cv2 as cv
 import CPR_utils as util
-import pandas as pd
 import pickle
+import time
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import OneHotEncoder
 from keras.models import Sequential, load_model
 from keras.layers import Dense, Conv2D, MaxPooling2D, Dropout, Flatten
 
+
+local_tmp = '../predictions_tmp'
+mturk_tmp = '../mturk_tmp'
 
 def get_digits(path):
     return pickle.load(open(path, "rb"))
@@ -30,32 +33,42 @@ def get_onehot_encoder():
 
     return ohe
 
-def predict_one_plate(digits, ohe, model, precision_threshold = 0):
+def predict_one_plate(digits, ohe, model, fname, confidence_threshold = 0, mturk_confidence_threshold = 0.5):
     prediction = {}
     preds = []
-    confidence =[]
+    confidences =[]
 
-    for d in digits:
-        d = np.reshape(d, (1, 28, 28, 1))
+    for dig in digits:
+        d = np.reshape(dig, (1, 28, 28, 1))
         out = model.predict(d)
         # Get max pre arg
         p = []
-        precision = 0
+        confidence = 0
         for i in range(len(out)):
             z = np.zeros(36)
             z[np.argmax(out[i])] = 1.
-            precision = max(out[i])
+            confidence = max(out[i])
             p.append(z)
         prediction = np.array(p)
         pred = ohe.inverse_transform(prediction)
 
-        if precision > precision_threshold:
+        char_pred = pred[0][0] #A
+        if confidence <= mturk_confidence_threshold:
+            # save dig to local first
+            char_save_name = fname + "_" + char_pred + "_" + str(confidence).replace('.','') + ".png"
+            dig_path = os.path.join(mturk_tmp, char_save_name)
+            cv.imwrite(dig_path, dig)
+
+            obj_name =f'{char_pred}/' + char_save_name
+            client.upload_file(dig_path, config['buckets']['segmented'], obj_name)
+
+        if confidence > confidence_threshold:
             preds.append(pred[0][0])  # pred[0][0] is predicted character  eg: preds.append('A')
-            confidence.append(precision)  # confidence
-            print('Prediction : ' + str(pred[0][0]) + ' , Precision : ' + str(precision))
+            confidences.append(confidence)  # confidence
+            print('Prediction : ' + str(pred[0][0]) + ' , Confidence : ' + str(confidence))
 
     prediction['preds'] = preds #predicted character list
-    prediction['confidence'] = confidence #confidence list
+    prediction['confidence'] = confidences #confidence list
     return prediction
 
 if __name__ == "__main__":
@@ -86,17 +99,18 @@ if __name__ == "__main__":
     # predict
     ohe = get_onehot_encoder()
 
-    local_tmp = '../predictions_tmp'
     for url in digit_urls:
-        digits = get_digits(url)
-        prediction = predict_one_plate(digits, ohe, model)
-
         fname = url.split(".com/")[1].split('.')[0]
+
+        digits = get_digits(url)
+        prediction = predict_one_plate(digits, ohe, model, fname)
+
         with open(os.path.join(local_tmp, fname), 'wb') as pf:
             pickle.dump(prediction, pf)
 
     # upload to s3
     files_to_upload = os.listdir(local_tmp)
     for f in files_to_upload:
-        util.upload_file_to_bucket(client, f, config['buckets']['cnnpredictions'])
+        client.upload_file(f, config['buckets']['cnnpredictions'], os.path.basename(f))
+
 

@@ -83,7 +83,6 @@ def scraping_job(aws_id, aws_secret):
         except requests.exceptions.RequestException as e:  # This is the correct syntax
             print(e)
 
-    client = boto3.client('s3', aws_access_key_id=aws_id, aws_secret_access_key=aws_secret)
     for f in file_name:
         # print(f)
         img_name_in_s3 = f[13:]
