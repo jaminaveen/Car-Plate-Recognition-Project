@@ -32,3 +32,6 @@ End-to-End pipeline for car number plate recognition using Deep Learning
 ![image](https://user-images.githubusercontent.com/37238004/70835944-a65f0380-1dcc-11ea-8def-d4bda672fbf8.png)
       
       
+#### Report Link
+https://docs.google.com/document/d/1Sa3jxZ_6bPCQz6wDBn-h-yO2jaeonfrUAkS2-ZWV7hU/edit?usp=sharing
+      
