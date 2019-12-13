@@ -106,10 +106,10 @@ if __name__ == "__main__":
     data_path = 'data.pickle'
     labels_path = 'labels.pickle'
     with open('../tmp/data.pickle', 'wb') as f:
-        client.download_fileobj(config['buckets']['chardata'], data_path, f)
+        client.download_file(config['buckets']['chardata'], data_path, f)
 
     with open('./tmp/labels.pickle', 'wb') as f:
-        client.download_fileobj(config['buckets']['chardata'], labels_path, f)
+        client.download_file(config['buckets']['chardata'], labels_path, f)
 
     d = open("../tmp/data.pickle", "rb")
     l = open("../tmp/labels.pickle", "rb")

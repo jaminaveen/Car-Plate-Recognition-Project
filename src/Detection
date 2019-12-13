@@ -114,7 +114,7 @@ def postprocess(frame, outs):
 
     return cropped
 
-def detect_one(input_path):
+def detect_one(input_path, local_tmp):
     # Open the input file
     cap = cv.VideoCapture(input_path)
 
@@ -161,7 +161,7 @@ def detect_one(input_path):
         cropped = postprocess(frame, outs)
 
         # save cropped
-        cv.imwrite(detected_plate_out_filename, cropped.astype(np.uint8))
+        cv.imwrite(os.path.join(local_tmp, detected_plate_out_filename), cropped.astype(np.uint8))
 
         # Put efficiency information.
         # The function getPerfProfile returns the overall time for inference(t)
@@ -174,7 +174,7 @@ def detect_one(input_path):
         # if is_video:
         #     vid_writer.write(frame.astype(np.uint8))
         # else:
-        cv.imwrite(bounding_boxed_out_filename, frame.astype(np.uint8))
+        cv.imwrite(os.path.join(local_tmp, bounding_boxed_out_filename), frame.astype(np.uint8))
 
 
 if __name__ == "__main__":
@@ -192,10 +192,12 @@ if __name__ == "__main__":
 
     img_urls = util.get_objecturls_from_bucket(client,config['buckets']['car_pic'])
 
-    for img_url in img_urls:
-        detect_one(img_url)
+    local_tmp = '../detected_tmp'
 
-    files_to_upload = os.listdir('../tmp')
+    for img_url in img_urls:
+        detect_one(img_url, local_tmp)
+
+    files_to_upload = os.listdir(local_tmp)
     for f in files_to_upload:
         util.upload_file_to_bucket(client,config['buckets']['detected'])
 
