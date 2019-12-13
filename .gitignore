@@ -106,8 +106,8 @@ venv.bak/
 # conf
 conf/
 
-# tmp
-tmp/
+# any tmp folder
+*_tmp/
 
 # .idea
 .idea/

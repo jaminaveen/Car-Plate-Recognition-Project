@@ -190,7 +190,7 @@ if __name__ == "__main__":
 
     client = boto3.client('s3', aws_access_key_id=aws_access_key_id, aws_secret_access_key=aws_secret_access_key)
 
-    img_urls = util.get_objecturls_from_bucket(client,config['buckets']['car_pic'])
+    img_urls = util.get_objecturls_from_bucket(client,config['buckets']['scraped_car_pic'])
 
     local_tmp = '../detected_tmp'
 

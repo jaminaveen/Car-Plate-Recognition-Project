@@ -1,14 +1,13 @@
 import argparse
+import os
+
 from bs4 import BeautifulSoup
-import pandas as pd
 import requests
-import re
-import urllib.request
 from urllib.request import Request, urlopen
 import boto3
 import configparser
 
-def scraping_job(aws_id, aws_secret):
+def scraping_job(client, config):
     car_images_list = []
     car_plate_images_list = []
     car_plate_images_text_list = []
@@ -16,7 +15,7 @@ def scraping_job(aws_id, aws_secret):
     headers = requests.utils.default_headers()
     headers.update({'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:52.0) Gecko/20100101 Firefox/52.0'})
 
-    for i in range(0, 9999):
+    for i in range(0, 20):
         url = 'http://platesmania.com/us/gallery-' + str(i)
         req = requests.get(url, headers=headers)
         soup = BeautifulSoup(req.content, 'html.parser')
@@ -36,7 +35,11 @@ def scraping_job(aws_id, aws_secret):
     file_names = []
     for img in car_plate_images_list:
         file_names.append(img.split('/')[-1])
-    file_names = ['./number_plate_images/images/' + m + '_' + str(n) for m, n in
+
+    plate_local_tmp = '../scraped_plate_tmp/'
+    if not os.path.exists(plate_local_tmp):
+        os.makedirs(plate_local_tmp)
+    file_names = [plate_local_tmp + m + '_' + str(n) for m, n in
                   zip(car_plate_images_text_list, file_names)]
 
     # downloading the images locally
@@ -51,19 +54,23 @@ def scraping_job(aws_id, aws_secret):
         output_file.write(data)
         output_file.close()
 
-    client = boto3.client('s3', aws_access_key_id=aws_id, aws_secret_access_key=aws_secret)
     for f in file_names:
         # print(file_to_upload)
         img_name_in_s3 = f[9:]
-        client.upload_file(f, 'data-pipeline-license-plate', 'License-plate/{}'.format(img_name_in_s3))
+        client.upload_file(f, config['buckets']['scraped_plate_pic'], f'{img_name_in_s3}')
 
     car_images_list = list(set(car_images_list))
     car_images_list.remove('http://img03.platesmania.com/191209/s/13915182.jpg')
 
+
+
+    carpic_local_tmp = '../scraped_carpic_tmp/'
+    if not os.path.exists(carpic_local_tmp):
+        os.makedirs(carpic_local_tmp)
     file_name = []
     for i in car_images_list:
         # print(i.split('/')[-1])
-        file_name.append('./car_images/' + i.split('/')[-1])
+        file_name.append(carpic_local_tmp + i.split('/')[-1])
 
 
     # downloading the images locally
@@ -89,8 +96,7 @@ def scraping_job(aws_id, aws_secret):
         # print(img_name_in_s3)
         # print(img_name_in_s3)
         # client.upload_file(f, '/data-pipeline-license-plate',img_name_in_s3)
-        client.upload_file(f, 'data-pipeline-license-plate', 'Car-pics/{}'.format(img_name_in_s3))
-
+        client.upload_file(f, config['buckets']['scraped_car_pic'], f'{img_name_in_s3}')
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Please provide amazon credentials')
@@ -103,4 +109,6 @@ if __name__ == "__main__":
     aws_access_key_id = config['AWS_access_credentials']['aws_access_key_id']
     aws_secret_access_key = config['AWS_access_credentials']['aws_secret_access_key']
 
-    scraping_job(aws_access_key_id, aws_secret_access_key)
+    client = boto3.client('s3', aws_access_key_id=aws_access_key_id, aws_secret_access_key=aws_secret_access_key)
+
+    scraping_job(client, config)
