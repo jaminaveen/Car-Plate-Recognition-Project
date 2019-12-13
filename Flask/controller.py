@@ -1,25 +1,16 @@
-import pandas as pd
-import pickle
-import numpy as np
-from sklearn.preprocessing import StandardScaler
-from scipy import stats
-from numpy.linalg import inv
-import scipy.stats as ss
-import tkinter
-import tkinter.filedialog as tkFileDialog
 import os
-from werkzeug.utils import secure_filename
 import cv2
 import random, string
-from boto3.s3.transfer import S3Transfer
 import boto3
-from IPython.display import Image
-from matplotlib import pyplot as plt
 import cv2 as cv
-import argparse
-import sys
 import numpy as np
 import os.path
+from keras.models import load_model
+import tensorflow as tf
+from sklearn.preprocessing import OneHotEncoder
+from keras.models import Sequential, load_model
+
+from keras.layers import Dense, Conv2D, MaxPooling2D, Dropout, Flatten
 
 ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
 
@@ -31,6 +22,7 @@ def allowed_file(filename):
 def video_capture(app):
     unique_identify_user = ''.join(random.choices(string.ascii_letters + string.digits, k=20))
     key = cv2.waitKey(1)
+
     webcam = cv2.VideoCapture(0 + cv2.CAP_DSHOW)
     while True:
         try:
@@ -310,7 +302,7 @@ def plate_segmentation(img_file_path):
     width = img.shape[1]
     area = height * width
 
-    scale1 = 0.001
+    scale1 = 0.01
     scale2 = 0.1
     area_condition1 = area * scale1
     area_condition2 = area * scale2
@@ -329,28 +321,35 @@ def plate_segmentation(img_file_path):
     # sort contours
     contours = sorted(contours, key=cv.contourArea, reverse=True)
 
-    cropped = []
+    cropped = dict()
+    #cropped = []
     for cnt in contours:
-        (x, y, w, h) = cv.boundingRect(cnt)
-
-        if (w * h > area_condition1 and w * h < area_condition2 and w / h > 0.3 and h / w > 0.3):
-            cv.drawContours(img, [cnt], 0, (0, 255, 0), 3)
-            cv.rectangle(img, (x, y), (x + w, y + h), (255, 0, 0), 2)
-            c = th2[y:y + h, x:x + w]
-            c = np.array(c)
-            c = cv.bitwise_not(c)
-            c = square(c)
-            c = cv.resize(c, (28, 28), interpolation=cv.INTER_AREA)
-            cropped.append(c)
-    # cv.imwrite('detection.png', img)
-    # print(croppe)
-    return img, cropped
+        (x,y,w,h) = cv.boundingRect(cnt)
+        distance_center = (2*x+w)/2
+        if distance_center in cropped:
+            pass
+        else:
+            if (w * h > area_condition1 and w * h < area_condition2 and w/h > 0.3 and h/w > 0.3):
+                cv.drawContours(img, [cnt], 0, (0, 255, 0), 1)
+                cv.rectangle(img, (x,y), (x+w,y+h), (255, 0, 0), 1)
+                c = th2[y:y+h,x:x+w]
+                c = np.array(c)
+                c = cv.bitwise_not(c)
+                c = square(c)
+                c = cv.resize(c,(28,28), interpolation = cv.INTER_AREA)
+                cropped[distance_center] = c
+                #cropped.append(c)
+    sorted_cropped = []
+    for x_center in sorted(cropped):
+        sorted_cropped.append(cropped[x_center])
+    cv.imwrite('detection.png', img)
+    return img, sorted_cropped
 
 
 def predict_cnn(sorted_digits):
     # Predict
     # for d in digits:
-    model = load_model('./conf/cnn_classifier.h5')
+    model = tf.keras.models.load_model('./conf/cnn_classifier.h5')
     prediction_list = []
     precision_list = []
     for d in sorted_digits:
@@ -380,4 +379,4 @@ def predict_cnn(sorted_digits):
         #         print('Prediction : ' + str(pred[0][0]) + ' , Precision : ' + )
         prediction_list.append(str(pred[0][0]))
         precision_list.append(str(precision))
-    return [str(pred[0][0]), str(precision)]
+    return [prediction_list, precision_list]
