@@ -1,4 +1,4 @@
-# Car-Plate-Recogonition-Project
+# Car-Plate-Recognition-Project
 End-to-End pipeline for car number plate recognition using Deep Learning
 
 ### Contents
