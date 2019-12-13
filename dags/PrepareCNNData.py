@@ -53,6 +53,9 @@ if __name__ == "__main__":
     client = boto3.client('s3', aws_access_key_id=aws_access_key_id, aws_secret_access_key=aws_secret_access_key)
 
     dataset_input_path = '../dataset'
+    if not os.path.exists(dataset_input_path):
+        os.makedirs(dataset_input_path)
+
     paths = prepare(dataset_input_path)
 
     for f in paths:

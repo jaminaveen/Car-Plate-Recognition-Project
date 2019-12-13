@@ -60,7 +60,7 @@ def predict_one_plate(digits, ohe, model, fname, confidence_threshold = 0, mturk
             cv.imwrite(dig_path, dig)
 
             obj_name =f'{char_pred}/' + char_save_name
-            client.upload_file(dig_path, config['buckets']['segmented'], obj_name)
+            client.upload_file(dig_path, config['buckets']['predicted'], obj_name)
 
         if confidence > confidence_threshold:
             preds.append(pred[0][0])  # pred[0][0] is predicted character  eg: preds.append('A')

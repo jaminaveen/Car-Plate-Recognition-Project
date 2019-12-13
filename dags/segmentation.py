@@ -1,9 +1,9 @@
 import argparse
 import configparser
 import os
+import pickle
 
 import boto3
-import pandas as pd
 import numpy as np
 import cv2 as cv
 import CPR_utils as util
@@ -82,7 +82,8 @@ def sort(vector):
     return vector
 
 def segment_one(img_file_path):
-    img = cv.imread(img_file_path)
+    cap = cv.VideoCapture(img_file_path)
+    _, img = cap.read()
     imgray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
 
     height = img.shape[0]
@@ -133,7 +134,7 @@ def segment_one(img_file_path):
     for x_center in sorted(cropped):
         sorted_cropped.append(cropped[x_center])
 
-    cv.imwrite('detection.png', img)
+    # cv.imwrite('detection.png', img)
     return img, sorted_cropped
 
 if __name__ == "__main__":
@@ -157,12 +158,32 @@ if __name__ == "__main__":
         # save corped_bounded_img locally first
         fname = img_url.split(".com/")[1].split('.')[0]
         corped_bounded_filename = fname + '_corped_bounded.jpg'
-        local_tmp = '../segmented_tmp'
-        cv.imwrite(os.path.join(local_tmp, corped_bounded_filename), corped_bounded_img.astype(np.uint8))
 
-        files_to_upload = os.listdir(local_tmp)
-        for f in files_to_upload:
-            client.upload_file(f, config['buckets']['segmented_archive'], os.path.basename(f))
+
+        segmented_corped_bounded_tmp = '../segmented_corped_bounded_tmp'
+        if not os.path.exists(segmented_corped_bounded_tmp):
+            os.makedirs(segmented_corped_bounded_tmp)
+
+        segmented_digits_tmp = '../segmented_digits_tmp'
+        if not os.path.exists(segmented_digits_tmp):
+            os.makedirs(segmented_digits_tmp)
+
+        digits_file_name = os.path.basename(img_url).split('.')[0] + '.pickle'
+        with open(os.path.join(segmented_digits_tmp, digits_file_name),'wb') as f:
+            pickle.dump(digits,f)
+
+        digits_to_upload = os.listdir(segmented_digits_tmp)
+        # upload digits to s3
+        for f in digits_to_upload:
+            upload_path = os.path.join(segmented_digits_tmp, f)
+            client.upload_file(upload_path, config['buckets']['segmented_digits'], os.path.basename(f))
+
+        cv.imwrite(os.path.join(segmented_corped_bounded_tmp, corped_bounded_filename), corped_bounded_img.astype(np.uint8))
+        #
+        # files_to_upload = os.listdir(segmented_corped_bounded_tmp)
+        # for f in files_to_upload:
+        #     print(f)
+        #     client.upload_file(f, config['buckets']['segmented_archive'], os.path.basename(f))
 
 
 # plt.imshow(img)

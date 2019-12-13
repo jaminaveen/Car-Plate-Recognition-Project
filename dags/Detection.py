@@ -95,6 +95,8 @@ def postprocess(frame, outs):
     # Perform non maximum suppression to eliminate redundant overlapping boxes with
     # lower confidences.
     indices = cv.dnn.NMSBoxes(boxes, confidences, confThreshold, nmsThreshold)
+
+    cropped = None
     for i in indices:
         i = i[0]
         box = boxes[i]
@@ -109,12 +111,18 @@ def postprocess(frame, outs):
 
         # crop the plate out
         cropped = frame[top:bottom, left:right].copy()
+
         # drawPred
         drawPred(classIds[i], confidences[i], left, top, right, bottom, frame)
 
+    # quick fix
+    if cropped is None:
+        print("cropped is None")
+        raise TypeError
+
     return cropped
 
-def detect_one(input_path, local_tmp):
+def detect_one(input_path, local_tmp, bounded_local_tmp):
     # Open the input file
     cap = cv.VideoCapture(input_path)
 
@@ -158,23 +166,26 @@ def detect_one(input_path, local_tmp):
         outs = net.forward(getOutputsNames(net))
 
         # Remove the bounding boxes with low confidence
-        cropped = postprocess(frame, outs)
+        try:
+            cropped = postprocess(frame, outs)
+            # save cropped
+            cv.imwrite(os.path.join(local_tmp, detected_plate_out_filename), cropped.astype(np.uint8))
 
-        # save cropped
-        cv.imwrite(os.path.join(local_tmp, detected_plate_out_filename), cropped.astype(np.uint8))
+            # Put efficiency information.
+            # The function getPerfProfile returns the overall time for inference(t)
+            # and the timings for each of the layers(in layersTimes)
+            # t, _ = net.getPerfProfile()
+            # label = 'Inference time: %.2f ms' % (t * 1000.0 / cv.getTickFrequency())
+            # cv.putText(frame, label, (0, 15), cv.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255))
 
-        # Put efficiency information.
-        # The function getPerfProfile returns the overall time for inference(t)
-        # and the timings for each of the layers(in layersTimes)
-        # t, _ = net.getPerfProfile()
-        # label = 'Inference time: %.2f ms' % (t * 1000.0 / cv.getTickFrequency())
-        # cv.putText(frame, label, (0, 15), cv.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255))
+            # Write the frame with the detection boxes
+            # if is_video:
+            #     vid_writer.write(frame.astype(np.uint8))
+            # else:
+            cv.imwrite(os.path.join(bounded_local_tmp, bounding_boxed_out_filename), frame.astype(np.uint8))
 
-        # Write the frame with the detection boxes
-        # if is_video:
-        #     vid_writer.write(frame.astype(np.uint8))
-        # else:
-        cv.imwrite(os.path.join(local_tmp, bounding_boxed_out_filename), frame.astype(np.uint8))
+        except TypeError as e:
+            print("No plate detected!")
 
 
 if __name__ == "__main__":
@@ -190,15 +201,21 @@ if __name__ == "__main__":
 
     client = boto3.client('s3', aws_access_key_id=aws_access_key_id, aws_secret_access_key=aws_secret_access_key)
 
-    img_urls = util.get_objecturls_from_bucket(client,config['buckets']['car_pic'])
+    img_urls = util.get_objecturls_from_bucket(client,config['buckets']['scraped_car_pic'])
 
     local_tmp = '../detected_tmp'
+    if not os.path.exists(local_tmp):
+        os.makedirs(local_tmp)
+
+    bounded_local_tmp = '../detected_bounded_tmp'
+    if not os.path.exists(bounded_local_tmp):
+        os.makedirs(bounded_local_tmp)
 
     for img_url in img_urls:
-        detect_one(img_url, local_tmp)
+        detect_one(img_url, local_tmp, bounded_local_tmp)
 
     files_to_upload = os.listdir(local_tmp)
     for f in files_to_upload:
-        client.upload_file(f,config['buckets']['detected'], os.path.basename(f))
+        client.upload_file(os.path.join(local_tmp,f),config['buckets']['detected'], os.path.basename(f))
 
     print("All files in car_pic have been detected.")
