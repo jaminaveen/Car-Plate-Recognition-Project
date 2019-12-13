@@ -8,7 +8,7 @@ services:
             - POSTGRES_DB=airflow
 
     webserver:
-        image: puckel/docker-airflow:1.10.2
+        image: naveenjami/car-plate-recognition_yolo_cnn
         restart: always
         depends_on:
             - postgres
@@ -17,6 +17,9 @@ services:
             - EXECUTOR=Local
         volumes:
             - ./dags:/usr/local/airflow/dags
+            - ./conf:/usr/local/airflow/conf
+            - ./requirements.txt:/usr/local/airflow/dags/requirements.txt
+                        
             # Uncomment to include custom plugins
             # - ./plugins:/usr/local/airflow/plugins
         ports:

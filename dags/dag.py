@@ -24,25 +24,18 @@ dag = DAG('Car_Plate_Recognition', default_args=default_args, schedule_interval=
 
 t0 = BashOperator(
     task_id='part0',
-    bash_command='pip install --user nltk',
+    bash_command='pip install --user -r requirements.txt',
     dag=dag)
+
+
 t1 = BashOperator(
-    task_id='part01',
-    bash_command='pip install --user boto3',
-    dag=dag)
-t2 = BashOperator(
-    task_id='part02',
-    bash_command='pip install --user xlrd',
-    dag=dag)
-
-t3 = BashOperator(
     task_id='part1',
-    bash_command='python /usr/local/airflow/dags/preprocessing.py',
+    bash_command='python /usr/local/airflow/dags/Detection.py',
     dag=dag)
 
-t4 = BashOperator(
+t2 = BashOperator(
     task_id='part2',
-    bash_command='python /usr/local/airflow/dags/clusteringweightage.py',
+    bash_command='python /usr/local/airflow/dags/TrainCNN.py',
     dag=dag)
 
-t0 >> t1 >> t2 >> t3 >> t4
+t0 >> t1 >> t2
