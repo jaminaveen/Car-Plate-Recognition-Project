@@ -224,4 +224,160 @@ def yolo_bounding_box(input_path):
         # save
         cv.imwrite(outputFile, frame.astype(np.uint8))
 
-    return outputFile
+    return 'cropped_plate_final.jpg'
+
+
+def get_contour_precedence(contour, cols):
+    tolerance_factor = 10
+    origin = cv.boundingRect(contour)
+    return ((origin[1] // tolerance_factor) * tolerance_factor) * cols + origin[0]
+
+
+def square(img):
+    """
+    This function resize non square image to square one (height == width)
+    :param img: input image as numpy array
+    :return: numpy array
+    """
+
+    # image after making height equal to width
+    squared_image = img
+
+    # Get image height and width
+    h = img.shape[0]
+    w = img.shape[1]
+
+    # In case height superior than width
+    if h > w:
+        diff = h - w
+        if diff % 2 == 0:
+            x1 = np.zeros(shape=(h, diff // 2))
+            x2 = x1
+        else:
+            x1 = np.zeros(shape=(h, diff // 2))
+            x2 = np.zeros(shape=(h, (diff // 2) + 1))
+
+        squared_image = np.concatenate((x1, img, x2), axis=1)
+
+    # In case height inferior than width
+    if h < w:
+        diff = w - h
+        if diff % 2 == 0:
+            x1 = np.zeros(shape=(diff // 2, w))
+            x2 = x1
+        else:
+            x1 = np.zeros(shape=(diff // 2, w))
+            x2 = np.zeros(shape=((diff // 2) + 1, w))
+
+        squared_image = np.concatenate((x1, img, x2), axis=0)
+
+    return squared_image
+
+
+def sort(vector):
+    sort = True
+    while (sort == True):
+
+        sort = False
+        for i in range(len(vector) - 1):
+            x_1 = vector[i][0]
+            y_1 = vector[i][1]
+
+            for j in range(i + 1, len(vector)):
+
+                x_2 = vector[j][0]
+                y_2 = vector[j][1]
+
+                if (x_1 >= x_2 and y_2 >= y_1):
+                    tmp = vector[i]
+                    vector[i] = vector[j]
+                    vector[j] = tmp
+                    sort = True
+
+                elif (x_1 < x_2 and y_2 > y_1):
+                    tmp = vector[i]
+                    vector[i] = vector[j]
+                    vector[j] = tmp
+                    sort = True
+    return vector
+
+
+def plate_segmentation(img_file_path):
+    img = cv.imread(img_file_path)
+    imgray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
+
+    height = img.shape[0]
+    width = img.shape[1]
+    area = height * width
+
+    scale1 = 0.001
+    scale2 = 0.1
+    area_condition1 = area * scale1
+    area_condition2 = area * scale2
+    # global thresholding
+    ret1, th1 = cv.threshold(imgray, 127, 255, cv.THRESH_BINARY)
+
+    # Otsu's thresholding
+    ret2, th2 = cv.threshold(imgray, 0, 255, cv.THRESH_BINARY + cv.THRESH_OTSU)
+
+    # Otsu's thresholding after Gaussian filtering
+    blur = cv.GaussianBlur(imgray, (5, 5), 0)
+    ret3, th3 = cv.threshold(blur, 0, 255, cv.THRESH_BINARY + cv.THRESH_OTSU)
+
+    contours, hierarchy = cv.findContours(th3, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)
+
+    # sort contours
+    contours = sorted(contours, key=cv.contourArea, reverse=True)
+
+    cropped = []
+    for cnt in contours:
+        (x, y, w, h) = cv.boundingRect(cnt)
+
+        if (w * h > area_condition1 and w * h < area_condition2 and w / h > 0.3 and h / w > 0.3):
+            cv.drawContours(img, [cnt], 0, (0, 255, 0), 3)
+            cv.rectangle(img, (x, y), (x + w, y + h), (255, 0, 0), 2)
+            c = th2[y:y + h, x:x + w]
+            c = np.array(c)
+            c = cv.bitwise_not(c)
+            c = square(c)
+            c = cv.resize(c, (28, 28), interpolation=cv.INTER_AREA)
+            cropped.append(c)
+    # cv.imwrite('detection.png', img)
+    # print(croppe)
+    return img, cropped
+
+
+def predict_cnn(sorted_digits):
+    # Predict
+    # for d in digits:
+    model = load_model('./conf/cnn_classifier.h5')
+    prediction_list = []
+    precision_list = []
+    for d in sorted_digits:
+
+        d = np.reshape(d, (1, 28, 28, 1))
+        out = model.predict(d)
+        # Get max pre arg
+        p = []
+        precision = 0
+        for i in range(len(out)):
+            z = np.zeros(36)
+            z[np.argmax(out[i])] = 1.
+            precision = max(out[i])
+            p.append(z)
+        prediction = np.array(p)
+
+        # one hot encoding
+        alphabets = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
+        classes = []
+        for a in alphabets:
+            classes.append([a])
+        ohe = OneHotEncoder(handle_unknown='ignore', categorical_features=None)
+        ohe.fit(classes)
+        pred = ohe.inverse_transform(prediction)
+
+        #     if precision > 0.8:
+        #         print('Prediction : ' + str(pred[0][0]) + ' , Precision : ' + )
+        prediction_list.append(str(pred[0][0]))
+        precision_list.append(str(precision))
+    return [str(pred[0][0]), str(precision)]
