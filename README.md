@@ -15,6 +15,9 @@ End-to-End pipeline for car number plate recognition using Deep Learning
            - CRNN Training pipeline
  9.  Dockerizing airflow pipelines
  
+#### Object Detection using YOLOv3:
+     Prior work on object detection repurposes classifiers to perform detection. Instead, object detection is framed as a regression            problem to spatially separated bounding boxes and associated class probabilities. A single neural network predicts bounding boxes and      class  probabilities directly from full images in one evaluation. Since the whole detection pipeline is a single network, it can be        optimized end-to-end directly on detection performance
+ 
 #### AWS DeepLens
      AWS DeepLens is a deep learning-enabled video camera. It is integrated with the Amazon Machine
      Learning ecosystem and can perform local inference against deployed models provisioned from the AWS Cloud.
