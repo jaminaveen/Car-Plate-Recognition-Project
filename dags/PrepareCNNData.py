@@ -56,6 +56,6 @@ if __name__ == "__main__":
     paths = prepare(dataset_input_path)
 
     for f in paths:
-        util.upload_file_to_bucket(client, f, config['buckets']['chardata'])
+        client.upload_file(f, config['buckets']['chardata'], os.path.basename(f))
 
     print("All character files in local have been prepared and uploaded to S3.")

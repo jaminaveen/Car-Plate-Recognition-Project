@@ -1,11 +1,4 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# ## -------- Connecting MTurk with python -------------------
-
-# In[3]:
-
-
+import argparse
 import boto3
 import configparser
 from bs4 import BeautifulSoup
@@ -13,91 +6,17 @@ import csv
 import time
 import glob
 import pandas as pd
+import CPR_utils as util
+
+
 
 region_name = 'us-east-1'
-
-
-# Uncomment this line to use in production
-# endpoint_url = 'https://mturk-requester.us-east-1.amazonaws.com'
-config = configparser.ConfigParser()
-config.read('../conf/config.cfg')
-
-aws_access_key_id = config['AWS_access_credentials']['aws_access_key_id']
-aws_secret_access_key = config['AWS_access_credentials']['aws_secret_access_key']
-
 endpoint_url = 'https://mturk-requester-sandbox.us-east-1.amazonaws.com'
-
 # Uncomment this line to use in production
 # endpoint = 'https://mturk-requester.us-east-1.amazonaws.com'
 
 
-# In[4]:
-
-
-mturk_client = boto3.client(
-    'mturk',
-    endpoint_url=endpoint_url,
-    region_name=region_name,
-    aws_access_key_id= aws_access_key_id,
-    aws_secret_access_key= aws_secret_access_key,
-)
-
-# This will return $10,000.00 in the MTurk Developer Sandbox
-#print(mturk_client.get_account_balance()['AvailableBalance'])
-
-
-# In[5]:
-
-
-s3_client = boto3.client(
-    's3',
-    aws_access_key_id= aws_access_key_id,
-    aws_secret_access_key= aws_secret_access_key,
-)
-def upload_segmented_char_to_bucket(s3_client, file,OBJECT_NAME):
-    s3_client.upload_file(file, 'segmentedchars', OBJECT_NAME)
-
-upload_segmented_char_to_bucket(s3_client,r'C:\Users\navee\Desktop\My_Masters_NEU\Fall2019\ProductGradeDataPipelines\NumberPlateDetection\ANPR\Licence_plate_recognition\USA_plates\dataset\2\2_6.jpg', r'2/2_6.jpg')
-
-
-# ## pull all urls
-
-# In[6]:
-
-
-def get_objecturls_from_bucket(client, bucket):
-    """
-    params:
-    - bucket: s3 bucket with target contents
-    - client: initialized s3 client object
-    """
-    next_token = ''
-    urls = []
-    base_kwargs = {
-        'Bucket':bucket
-    }
-    while next_token is not None:
-        kwargs = base_kwargs.copy()
-        if next_token != '':
-            kwargs.update({'ContinuationToken': next_token})
-        results = client.list_objects_v2(**kwargs)
-        contents = results.get('Contents')
-        #print(contents)
-        for i in contents:
-            k = i.get('Key')
-            url = "https://%s.s3.amazonaws.com/%s" % (bucket, k)
-            urls.append(url)
-        next_token = results.get('NextContinuationToken')
-    return urls
-
-
-# ## create hit
-
-# In[17]:
-
-
-def publish_hits(urls, hits_meta_file, create_hits_in_live = False):
-
+def publish_hits(urls, create_hits_in_live = False):
     #uncomment for production setting
     #if len(urls) = 100: 
     if True:
@@ -163,9 +82,6 @@ def publish_hits(urls, hits_meta_file, create_hits_in_live = False):
     return hit_ids
 
 
-# In[18]:
-
-
 def get_all_hit_ids(prefix = '..\data\hits_meta'):
     
     all_hit_ids = []
@@ -178,11 +94,6 @@ def get_all_hit_ids(prefix = '..\data\hits_meta'):
                 all_hit_ids.append([row[0],row[1],row[2]])
             
     return all_hit_ids
-        
-    
-
-
-# In[19]:
 
 
 def parse_hit_response(hit_id):
@@ -196,28 +107,53 @@ def parse_hit_response(hit_id):
         label_written = ' '
     
     return selected_label, label_written
-    
 
 
-# In[23]:
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description='Please provide amazon credentials')
+    parser.add_argument('--conf', default="../conf/config.cfg", help='the path of config.cfg')
+    args = parser.parse_args()
+
+    config = configparser.ConfigParser()
+    config.read(args.conf)
+
+    aws_access_key_id = config['AWS_access_credentials']['aws_access_key_id']
+    aws_secret_access_key = config['AWS_access_credentials']['aws_secret_access_key']
+
+    mturk_client = boto3.client(
+        'mturk',
+        endpoint_url=endpoint_url,
+        region_name=region_name,
+        aws_access_key_id=aws_access_key_id,
+        aws_secret_access_key=aws_secret_access_key,
+    )
+
+    s3_client = boto3.client(
+        's3',
+        aws_access_key_id=aws_access_key_id,
+        aws_secret_access_key=aws_secret_access_key,
+    )
 
 
-urls = get_objecturls_from_bucket(s3_client,'segmentedchars')
-published_hit_ids = publish_hits(urls, '..\data\hits_meta.csv')
-all_hit_ids = get_all_hit_ids()
-with open("..\data\mturk_valid.csv",'w') as f:
-    f.write("hitid,image_s3_url,predictedlabel,selected_label,labelwritten\n")
-    for hit in all_hit_ids:
-        image_s3_url = hit[0]
-        hit_id = hit[1]
-        predicted_label = hit[2]
-        selected_label, label_written = parse_hit_response(hit[1])
-        #print(selected_label, label_written)
-        f.write("%s,%s,%s,%s,%s\n"%(hit_id,image_s3_url,predicted_label,selected_label,label_written))
-    f.close()
+    urls = util.get_objecturls_from_bucket(s3_client,'segmentedchars')
+
+    published_hit_ids = publish_hits(urls)
+
+    all_hit_ids = get_all_hit_ids()
 
 
-# In[ ]:
+
+    with open("..\data\mturk_valid.csv",'w') as f:
+        f.write("hitid,image_s3_url,predictedlabel,selected_label,labelwritten\n")
+        for hit in all_hit_ids:
+            image_s3_url = hit[0]
+            hit_id = hit[1]
+            predicted_label = hit[2]
+            selected_label, label_written = parse_hit_response(hit[1])
+            #print(selected_label, label_written)
+            f.write(f"{hit_id},{image_s3_url},{predicted_label},{selected_label},{label_written}\n")
+
+
 
 
 

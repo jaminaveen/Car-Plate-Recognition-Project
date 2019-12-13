@@ -137,8 +137,9 @@ if __name__ == "__main__":
     model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
     history = model.fit(X_train, y_train, validation_data=(X_test, y_test), epochs=20, batch_size=64)
 
-    model.save('../conf/cnn_classifier.h5')
-    util.upload_file_to_bucket(client, '../conf/cnn_classifier.h5', config['buckets']['models'])
+    model_save_path = '../conf/cnn_classifier.h5'
+    model.save(model_save_path)
+    client.upload_file(model_save_path, config['buckets']['models'], os.path.basename(model_save_path))
 
     print("model has been saved and uploaded!")
 

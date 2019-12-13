@@ -199,6 +199,6 @@ if __name__ == "__main__":
 
     files_to_upload = os.listdir(local_tmp)
     for f in files_to_upload:
-        util.upload_file_to_bucket(client,config['buckets']['detected'])
+        client.upload_file(f,config['buckets']['detected'], os.path.basename(f))
 
     print("All files in car_pic have been detected.")

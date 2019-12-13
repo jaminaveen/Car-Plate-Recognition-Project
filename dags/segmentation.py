@@ -118,7 +118,7 @@ def segment_one(img_file_path):
         if distance_center in cropped:
             pass
         else:
-            if (w * h > area_condition1 and w * h < area_condition2 and w / h > 0.3 and h / w > 1):
+            if area_condition1 < w * h < area_condition2 and w / h > 0.3 and h / w > 1:
                 cv.drawContours(img, [cnt], 0, (0, 255, 0), 1)
                 cv.rectangle(img, (x, y), (x + w, y + h), (255, 0, 0), 1)
                 c = th2[y:y + h, x:x + w]
@@ -162,7 +162,7 @@ if __name__ == "__main__":
 
         files_to_upload = os.listdir(local_tmp)
         for f in files_to_upload:
-            util.upload_file_to_bucket(client, config['buckets']['segmented'])
+            client.upload_file(f, config['buckets']['segmented_archive'], os.path.basename(f))
 
 
 # plt.imshow(img)
