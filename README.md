@@ -27,7 +27,8 @@ End-to-End pipeline for car number plate recognition using Deep Learning
       With AWS DeepLens, you train a project model using a supported deep learning modeling framework.
       You can train the model on the AWS Cloud or elsewhere. Currently, AWS DeepLens supports Caffe, TensorFlow and Apache MXNet frameworks
       
-##### Flask App - Prediction
+##### Flask App - Sample Prediction
+
 ![image](https://user-images.githubusercontent.com/37238004/70835944-a65f0380-1dcc-11ea-8def-d4bda672fbf8.png)
       
       
