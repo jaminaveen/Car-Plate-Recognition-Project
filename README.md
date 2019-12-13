@@ -1,4 +1,4 @@
-# Car-Plate-Recogonition-Project
+# Car-Plate-Recognition-Project
 End-to-End pipeline for car number plate recognition using Deep Learning
 
 ### Contents
@@ -15,6 +15,10 @@ End-to-End pipeline for car number plate recognition using Deep Learning
            - CRNN Training pipeline
  9.  Dockerizing airflow pipelines
  
+#### Object Detection using YOLOv3:
+     Prior work on object detection repurposes classifiers to perform detection. Instead, object detection is framed as a regression            problem to spatially separated bounding boxes and associated class probabilities. 
+     A single neural network predicts bounding boxes and class  probabilities directly from full images in one evaluation. Since the whole      detection pipeline is a single network, it can be optimized end-to-end directly on detection performance.
+ 
 #### AWS DeepLens
      AWS DeepLens is a deep learning-enabled video camera. It is integrated with the Amazon Machine
      Learning ecosystem and can perform local inference against deployed models provisioned from the AWS Cloud.
@@ -23,4 +27,11 @@ End-to-End pipeline for car number plate recognition using Deep Learning
       With AWS DeepLens, you train a project model using a supported deep learning modeling framework.
       You can train the model on the AWS Cloud or elsewhere. Currently, AWS DeepLens supports Caffe, TensorFlow and Apache MXNet frameworks
       
+##### Flask App - Sample Prediction
+
+![image](https://user-images.githubusercontent.com/37238004/70835944-a65f0380-1dcc-11ea-8def-d4bda672fbf8.png)
+      
+      
+#### Report Link
+https://docs.google.com/document/d/1Sa3jxZ_6bPCQz6wDBn-h-yO2jaeonfrUAkS2-ZWV7hU/edit?usp=sharing
       

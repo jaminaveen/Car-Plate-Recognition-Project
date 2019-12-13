@@ -54,8 +54,8 @@ def video_capture(app):
 
 
 def upload_aws(SOURCE_FILENAME):
-    aws_id = 'AKIAJ4CSH5Z3BFHREHQQ'
-    aws_secret = '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'
+    aws_id = ''
+    aws_secret = ''
     S3 = boto3.client('s3', aws_access_key_id=aws_id, aws_secret_access_key=aws_secret)
     S3.upload_file(SOURCE_FILENAME, 'info7374', SOURCE_FILENAME)
 
