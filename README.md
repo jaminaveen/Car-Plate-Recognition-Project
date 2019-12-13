@@ -15,3 +15,12 @@ End-to-End pipeline for car number plate recognition using Deep Learning
            - CRNN Training pipeline
  9.  Dockerizing airflow pipelines
  
+#### AWS DeepLens
+     AWS DeepLens is a deep learning-enabled video camera. It is integrated with the Amazon Machine
+     Learning ecosystem and can perform local inference against deployed models provisioned from the AWS Cloud.
+     
+##### Supported Modeling Frameworks:
+      With AWS DeepLens, you train a project model using a supported deep learning modeling framework.
+      You can train the model on the AWS Cloud or elsewhere. Currently, AWS DeepLens supports Caffe, TensorFlow and Apache MXNet frameworks
+      
+      
