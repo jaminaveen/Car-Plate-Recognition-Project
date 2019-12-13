@@ -30,7 +30,7 @@ def get_onehot_encoder():
 
     return ohe
 
-def predict_one(digits, ohe, model, precision_threshold = 0):
+def predict_one_plate(digits, ohe, model, precision_threshold = 0):
     prediction = {}
     preds = []
     confidence =[]
@@ -50,12 +50,12 @@ def predict_one(digits, ohe, model, precision_threshold = 0):
         pred = ohe.inverse_transform(prediction)
 
         if precision > precision_threshold:
-            preds.append(pred[0][0])
-            confidence.append(precision)
+            preds.append(pred[0][0])  # pred[0][0] is predicted character  eg: preds.append('A')
+            confidence.append(precision)  # confidence
             print('Prediction : ' + str(pred[0][0]) + ' , Precision : ' + str(precision))
 
-    prediction['preds'] = preds
-    prediction['confidence'] = confidence
+    prediction['preds'] = preds #predicted character list
+    prediction['confidence'] = confidence #confidence list
     return prediction
 
 if __name__ == "__main__":
@@ -89,7 +89,7 @@ if __name__ == "__main__":
     local_tmp = '../predictions_tmp'
     for url in digit_urls:
         digits = get_digits(url)
-        prediction = predict_one(digits, ohe, model)
+        prediction = predict_one_plate(digits, ohe, model)
 
         fname = url.split(".com/")[1].split('.')[0]
         with open(os.path.join(local_tmp, fname), 'wb') as pf:
@@ -98,5 +98,5 @@ if __name__ == "__main__":
     # upload to s3
     files_to_upload = os.listdir(local_tmp)
     for f in files_to_upload:
-        util.upload_file_to_bucket(client, config['buckets']['cnnpredictions'])
+        util.upload_file_to_bucket(client, f, config['buckets']['cnnpredictions'])
 
