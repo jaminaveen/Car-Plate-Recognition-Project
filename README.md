@@ -14,6 +14,10 @@ End-to-End pipeline for car number plate recognition using Deep Learning
            - CNN Training pipeline
            - CRNN Training pipeline
  9.  Dockerizing airflow pipelines
+            
+            To fire up docker service, clone this repository and cd into this folder
+            - docker-compose -f docker-compose-CeleryExecutor.yml up
+            - docker-compose -f docker-compose-CeleryExecutor.yml up -d (detached mode)
  
 #### Object Detection using YOLOv3:
      Prior work on object detection repurposes classifiers to perform detection. Instead, object detection is framed as a regression            problem to spatially separated bounding boxes and associated class probabilities. 
