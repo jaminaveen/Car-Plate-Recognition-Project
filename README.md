@@ -1,6 +1,8 @@
 # Car-Plate-Recognition-Project
 End-to-End pipeline for car number plate recognition using Deep Learning
 
+![Pipeline overview](/imgs/INFO7374%20CarPlate%20Pipeline%20v2.0.png)
+
 ### Contents
  1.  YoloV3 for License plate detection
  2.  Segmentation of digits using Image Pre-processing techniques
