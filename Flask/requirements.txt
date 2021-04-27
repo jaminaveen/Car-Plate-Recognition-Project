@@ -173,7 +173,7 @@ virtualenv==16.7.6
 wcwidth==0.1.7
 webencodings==0.5.1
 websocket-client==0.54.0
-Werkzeug==0.15.2
+Werkzeug==0.15.3
 xlrd==1.2.0
 XlsxWriter==1.1.2
 xmltodict==0.12.0
