@@ -11,7 +11,7 @@ Click==7.0
 cloudpickle==1.2.1
 colorama==0.4.1
 cycler==0.10.0
-dask==2.2.0
+dask==2021.10.0
 decorator==4.4.0
 defusedxml==0.6.0
 distributed==2.2.0
