@@ -21,7 +21,7 @@ confluent-kafka==1.0.0
 coverage==4.5.4
 cycler==0.10.0
 cymem==2.0.2
-dask==1.1.4
+dask==2021.10.0
 data-builder==1.4.12
 datasketch==1.4.1
 decorator==4.3.0
