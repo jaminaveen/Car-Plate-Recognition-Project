@@ -68,7 +68,7 @@ jupyter-repo2docker==0.7.0
 jupyterlab==0.35.4
 jupyterlab-server==0.2.0
 kiwisolver==1.0.1
-lxml==4.4.1
+lxml==4.6.5
 MarkupSafe==1.1.1
 matplotlib==3.0.2
 mccabe==0.6.1
