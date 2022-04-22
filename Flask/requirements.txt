@@ -112,7 +112,7 @@ Pygments==2.3.1
 pyhocon==0.3.42
 pymongo==3.9.0
 pyparsing==2.2.0
-PyPDF2==1.26.0
+PyPDF2==1.27.5
 pypiwin32==223
 pytest==3.10.1
 pytest-cov==2.8.1
