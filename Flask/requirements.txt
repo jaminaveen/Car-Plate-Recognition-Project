@@ -87,7 +87,7 @@ neotime==1.7.1
 networkx==2.2
 nltk==3.4
 notebook==5.7.4
-numpy==1.16.2
+numpy==1.22.0
 opencv-python==4.1.2.30
 openpyxl==2.5.14
 packaging==19.2
